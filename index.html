@@ -1,0 +1,133 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans, sans-serif); color: #000; }
+
+  .page { min-height: 100vh; background: url('https://i.imgur.com/placeholder.png') center/cover no-repeat; }
+
+  .header { padding: 1.25rem 1.5rem 1rem; display: flex; align-items: center; gap: 12px; border-bottom: 0.5px solid #CCC1DA; margin-bottom: 1.5rem; background: rgba(255,255,255,0.7); }
+  .logo-img { height: 48px; }
+  .subtitle { font-size: 13px; color: #555; margin-top: 2px; }
+
+  .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 0 1.5rem 1.5rem; }
+  @media (max-width: 600px) { .layout { grid-template-columns: 1fr; } }
+
+  .card { background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1.25rem; border: 0.5px solid #CCC1DA; }
+
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric-card { background: #F6F3FA; border-radius: 8px; padding: 0.875rem 1rem; }
+  .metric-label { font-size: 12px; color: #555; margin-bottom: 4px; }
+  .metric-value { font-size: 22px; font-weight: 500; color: #000; }
+  .metric-sub { font-size: 11px; color: #888; margin-top: 2px; }
+
+  .highlight-card { background: #7500C0; border-radius: 8px; padding: 1rem; text-align: center; margin-bottom: 1rem; }
+  .highlight-label { font-size: 12px; color: #CCC1DA; margin-bottom: 4px; }
+  .highlight-value { font-size: 30px; font-weight: 500; color: #fff; letter-spacing: -0.5px; }
+
+  .bar-label { font-size: 12px; color: #555; margin-bottom: 4px; }
+  .bar-track { height: 8px; background: #F6F3FA; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+  .bar-fill { height: 100%; background: #7500C0; border-radius: 4px; transition: width 0.3s; }
+  .bar-fill.lilac { background: #CCC1DA; }
+
+  .note { font-size: 11px; color: #555; line-height: 1.5; padding: 0.75rem 1rem; border: 0.5px solid #CCC1DA; border-radius: 8px; margin-top: 0.75rem; background: rgba(255,255,255,0.6); }
+
+  .section-title { font-size: 12px; font-weight: 500; color: #000; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .slider-row { margin-bottom: 1.1rem; }
+  .slider-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .slider-label { font-size: 13px; color: #000; }
+  .slider-val { font-size: 13px; font-weight: 500; color: #7500C0; min-width: 52px; text-align: right; }
+  input[type=range] { width: 100%; accent-color: #7500C0; }
+  .hint { font-size: 11px; color: #888; margin-top: 2px; }
+</style>
+
+<div style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png'); background-size: cover; background-position: center; min-height: 100vh; padding-bottom: 2rem;">
+
+  <div class="header">
+    <div style="width:40px;height:40px;border-radius:50%;background:#7500C0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" fill="white"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div style="font-size:18px;font-weight:700;color:#000;">Calculadora de ahorro operativo</div>
+      <div style="font-size:12px;color:#555;">Ajustá los supuestos según tu operación</div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="card">
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-label">Tickets totales / mes</div>
+          <div class="metric-value" id="val-tickets">—</div>
+          <div class="metric-sub">en la operación</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Horas ahorradas / mes</div>
+          <div class="metric-value" id="val-hours-month">—</div>
+          <div class="metric-sub">en búsqueda y diagnóstico</div>
+        </div>
+      </div>
+
+      <div class="highlight-card">
+        <div class="highlight-label">Ahorro operativo estimado / año</div>
+        <div class="highlight-value" id="val-saving-year">USD —</div>
+      </div>
+
+      <div>
+        <div class="bar-label">Horas ahorradas / año</div>
+        <div class="bar-track"><div class="bar-fill" id="bar-hours" style="width:0%"></div></div>
+        <div class="bar-label">Ahorro anual (% del costo total estimado)</div>
+        <div class="bar-track"><div class="bar-fill lilac" id="bar-pct" style="width:0%"></div></div>
+      </div>
+
+      <div class="note">
+        <strong style="font-weight:500;color:#000;">Nota metodológica:</strong> Supuestos conservadores basados en métricas típicas de operaciones de Service Desk. Se recomienda validar con datos reales en un piloto.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Supuestos ajustables</div>
+
+      <div class="slider-row">
+        <div class="slider-header"><span class="slider-label">Agentes en el equipo</span><span class="slider-val" id="out-agents">20</span></div>
+        <input type="range" id="sl-agents" min="1" max="100" step="1" value="20">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="slider-label">Tickets por agente por mes</span><span class="slider-val" id="out-tickets">100</span></div>
+        <input type="range" id="sl-tickets" min="10" max="500" step="10" value="100">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="slider-label">Minutos ahorrados por ticket</span><span class="slider-val" id="out-mins">7 min</span></div>
+        <input type="range" id="sl-mins" min="2" max="20" step="1" value="7">
+        <div class="hint">Rango típico: 5–10 min (búsqueda + diagnóstico)</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-header"><span class="slider-label">Costo hora agente (USD)</span><span class="slider-val" id="out-cost">$15</span></div>
+        <input type="range" id="sl-cost" min="5" max="60" step="1" value="15">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function calc() {
+    var a = +document.getElementById('sl-agents').value;
+    var t = +document.getElementById('sl-tickets').value;
+    var m = +document.getElementById('sl-mins').value;
+    var c = +document.getElementById('sl-cost').value;
+    var totalTickets = a * t;
+    var hoursMonth = Math.round((totalTickets * m) / 60);
+    var hoursYear = hoursMonth * 12;
+    var savingYear = Math.round(hoursYear * c);
+    var totalCostYear = Math.round(a * t * 12 * (20/60) * c);
+    var pct = totalCostYear > 0 ? Math.min(Math.round((savingYear/totalCostYear)*100), 100) : 0;
+    document.getElementById('val-tickets').textContent = totalTickets.toLocaleString();
+    document.getElementById('val-hours-month').textContent = hoursMonth.toLocaleString();
+    document.getElementById('val-saving-year').textContent = 'USD ' + savingYear.toLocaleString();
+    document.getElementById('bar-hours').style.width = Math.min(Math.round(hoursYear/100),100)+'%';
+    document.getElementById('bar-pct').style.width = pct+'%';
+  }
+  document.getElementById('sl-agents').addEventListener('input', function(){ document.getElementById('out-agents').textContent = this.value; calc(); });
+  document.getElementById('sl-tickets').addEventListener('input', function(){ document.getElementById('out-tickets').textContent = this.value; calc(); });
+  document.getElementById('sl-mins').addEventListener('input', function(){ document.getElementById('out-mins').textContent = this.value+' min'; calc(); });
+  document.getElementById('sl-cost').addEventListener('input', function(){ document.getElementById('out-cost').textContent = '$'+this.value; calc(); });
+  calc();
+</script>
